@@ -7,8 +7,8 @@ The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
 1. Install uv: https://github.com/astral-sh/uv
 2. Clone this repo and cd into the project directory.
 ```
-git clone https://github.com/cecilpang/autobus.git
-cd autobus
+git clone https://github.com/cecilpang/autobus-paper.git
+cd autobus-paper
 ```
 3. Place your OpenAI API key in a file named '.env' at the project directory. There should be one line in .env like this:</br>
 OPENAI_API_KEY=your OpenAI key
