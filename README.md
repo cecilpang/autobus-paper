@@ -14,7 +14,7 @@ cd autobus-paper
 OPENAI_API_KEY=your OpenAI key
 
 4. Create sample data. A sqlite database file 'db.sqlite' will be created in the sub-directory database/</br>
-```uv run src/create_sample_data.py```
+```uv run --script src/create_sample_data.py```
 5. Execute Task 1:</br>
 AI agent generates a logic program:<br/>
 ```uv run --env-file .env --script src/task_1.py```</br>
