@@ -1,25 +1,22 @@
 :- use_module(library(prosqlite)).
 
-% Optional: still allow running as a script
 :- initialization(main).
 
 % -----------------------------
 % Public entry point
 % -----------------------------
 
-%% main/0
-%% Entry point to run the program
 main :-
     init_db,
     save_outcome_to_database,
     sqlite_disconnect(db).
 
 % -----------------------------
-% Database initialization 
+% Database initialization
 % -----------------------------
 
 db_path('database/db.sqlite').
-outcome_table('template_outcome_table').
+outcome_table('median_household_income').
 
 init_db :-
     db_path(DbPath),
@@ -30,39 +27,50 @@ init_db :-
                    ]).
 
 % -----------------------------
-% Table-as-predicate
+% Tool call via Python function
 % -----------------------------
 
-% After sqlite_connect/3 with as_predicates(true),
-% the table `people` and `output_table` becomes the predicates:
-%
-%   people(Id, Name)
-%   output_table(Id, Name) 
+%% median_household_income_city(+City, -Median)
+%% Calls Python tool_for_prolog:median_household_income(City) -> Median (integer)
+median_household_income_city(City, Median) :-
+    py_call(tool_for_prolog:median_household_income(City), Median).
 
 % -----------------------------
 % Business rules
 % -----------------------------
 
+%% subscriber_city(-City)
+%% City where at least one subscriber (consumer with a subscription) resides.
+subscriber_city(City) :-
+    subscription(_SubscriptionId, ConsumerId, _Status, _SubscriptionRate, _ProductId, _RiskLevel),
+    consumer(ConsumerId, _ConsumerName, City).
 
+%% distinct_subscriber_city(-City)
+%% Unique cities derived from subscriber_city/1.
+distinct_subscriber_city(City) :-
+    setof(C, subscriber_city(C), Cities),
+    member(City, Cities).
+
+%% outcome_row(-City, -Median)
+%% Produces outcome rows.
+outcome_row(City, Median) :-
+    distinct_subscriber_city(City),
+    median_household_income_city(City, Median).
 
 % -----------------------------
 % Actions
 % -----------------------------
-%% save_outcome_to_database/0
-%% Clears output_table then copies every row from people into output_table.
+
 save_outcome_to_database :-
-    % remove existing rows from output table
     outcome_table(OutcomeTable),
     format(atom(DeleteSql), "DELETE FROM ~w;", [OutcomeTable]),
     sqlite_query(db, DeleteSql, _),
 
-    % iterate rows and insert them into output_table
-    forall( people(Id, Name),
+    forall( outcome_row(City, Median),
             (
-                escape_sql_string(Name, Escaped),
-                % build a safe SQL literal for the name (single-quoted, with single quotes doubled)
+                escape_sql_string(City, EscapedCity),
                 outcome_table(OutcomeTable),
-                format(atom(SQL), "INSERT INTO ~w VALUES (~w, '~w');", [OutcomeTable, Id, Escaped]),
+                format(atom(SQL), "INSERT INTO ~w(city, median_household_income) VALUES ('~w', ~w);", [OutcomeTable, EscapedCity, Median]),
                 sqlite_query(db, SQL, _)
             )
           ).
@@ -71,14 +79,6 @@ save_outcome_to_database :-
 % Helpers
 % -----------------------------
 
-%% escape_sql_string(+In:string, -Out:atom)
-%% Replace single quotes ' with '' for safe SQL single-quoted literal insertion.
 escape_sql_string(In, Out) :-
-    % split on single quote
     split_string(In, "'", "'", Parts),
-    % join with doubled single-quote
     atomic_list_concat(Parts, "''", Out).
-
-% -----------------------------
-% End of file
-% -----------------------------

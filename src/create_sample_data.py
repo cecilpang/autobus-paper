@@ -42,6 +42,12 @@ ddl = """
         subscription_id INTEGER PRIMARY KEY,
         consumer_id INTEGER
     );
+    DROP TABLE IF EXISTS median_household_income;
+    CREATE TABLE median_household_income 
+    (
+        city TEXT PRIMARY KEY,
+        median_household_income INTEGER
+    );
 """
 
 def create_tables(conn):
@@ -152,10 +158,13 @@ def insert_profile_attributes(conn):
       - age_group
       - education
       - household_size
+      - household_income  (20000 to 300000)
     """
     age_groups = ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
     educations = ["High School", "Some College", "Bachelor", "Master", "Doctorate"]
     household_sizes = ["1", "2", "3", "4", "5+"]
+    # household_income is numeric, but stored as TEXT in attribute_value
+    income_min, income_max = 20000, 300000
 
     cursor = conn.cursor()
 
@@ -170,25 +179,31 @@ def insert_profile_attributes(conn):
     attributes_to_insert = []
 
     for cid in consumer_ids:
-        if cid in subscribed_consumers:
-            prob = 0.75
-        else:
-            prob = 0.10
+        prob = 0.75 if cid in subscribed_consumers else 0.10
 
         # age_group
         if random.random() < prob:
             attributes_to_insert.append(
                 (cid, "age_group", random.choice(age_groups))
             )
+
         # education
         if random.random() < prob:
             attributes_to_insert.append(
                 (cid, "education", random.choice(educations))
             )
+
         # household_size
         if random.random() < prob:
             attributes_to_insert.append(
                 (cid, "household_size", random.choice(household_sizes))
+            )
+
+        # household_income
+        if random.random() < prob:
+            household_income = random.randint(income_min, income_max)
+            attributes_to_insert.append(
+                (cid, "household_income", str(household_income))
             )
 
     if attributes_to_insert:

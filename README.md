@@ -19,4 +19,9 @@ OPENAI_API_KEY=your OpenAI key
 AI agent generates a logic program:<br/>
 ```uv run --env-file .env --script src/task_1.py```</br>
 Execute the logic program:<br/>
-```uv run --script src/run_prolog.py generated-pl-programs/task_1_logic.pl```
+```uv run --script src/run_prolog.py generated/task_1_logic.pl```
+6. Execute Task 2:</br>
+AI agent generates a logic program:<br/>
+```uv run --env-file .env --script src/task_2.py```</br>
+Execute the logic program:<br/>
+```uv run --script src/run_prolog.py generated/task_2_logic.pl```

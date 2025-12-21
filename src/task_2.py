@@ -4,7 +4,7 @@ from util import WorkflowContext, AgentSession
 from agent.core_agent import core_agent, AGENT_NAME
 
 """
-Task 1: Identify potentially savable churns.
+Task 2: Find the median household incomes of the cities in which our subscribers reside.
 """
 
 async def main():
@@ -13,15 +13,13 @@ async def main():
     with trace(workflow_name=AGENT_NAME, trace_id=trace_id):
 
         task_instruction = """
-            Task ID: task_1
-            Find savable churn. A subscription is a savable churn if all of the following criteria are met:
-            1. The subscription's churn risk level is 4.
-            2. The subscription rate is $10 or more.
-            3. The subscription is for 'Premium Plan' or 'Family Plan'.
-            4. The subscription is active.
+            Task ID: task_2
+            Find the median household incomes of the cities in which our subscribers reside:
+            1. Get the list of cities from the database
+            2. Call a Python function 'tool_for_prolog:median_household_income', passing in each city, expecting an integer returned.
             Outcome specification:
-            The outcome has two fields: subscription_id, consumer_id
-            Save the outcome to the database table 'savable_churn'
+            The outcome has two fields: city, median_household_income
+            Save the outcome to the database table 'median_household_income'
         """
 
         print(f"View trace: https://platform.openai.com/traces/trace?trace_id={trace_id}\n")

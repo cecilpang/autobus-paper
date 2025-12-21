@@ -6,7 +6,7 @@ from config import PROLOG_TEMPLATE_DIR, GENERATED_PROLOG_DIR, DB_PATH
 
 
 LLM = "gpt-5.2"
-AGENT_NAME = "subscription_agent"
+AGENT_NAME = "core_agent"
 
 
 @function_tool
@@ -64,12 +64,12 @@ async def save_text_to_file(text:str, filepath:str, encoding:str="utf-8") -> Non
         f.write(text)
 
 
-subscription_agent = Agent(
+core_agent = Agent(
     name=AGENT_NAME,
     instructions=f"""
     You are an expert in logic programming in SWI-Prolog. Generate prolog programs with facts and 
     foundational rules based on the database schema and task specific rules from the user prompt.
-    Use the Prolog template 'facts_rules_actions_template.pl'. 
+    Use the Prolog template 'facts_tools_rules_actions.pl'. Do not place string in multiple lines.
     Get the Task ID from the user prompt and save the program to a file with path {GENERATED_PROLOG_DIR+'/<Task ID>_logic.pl'}.
     If you fail to get the prolog template or the database schema, stop and output error message.
     """,
