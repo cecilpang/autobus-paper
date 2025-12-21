@@ -8,7 +8,7 @@ random.seed(12345)
 ddl = """
     DROP TABLE IF EXISTS consumer;
     CREATE TABLE consumer (
-        consumer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        consumer_id INTEGER PRIMARY KEY,
         consumer_name TEXT,
         city TEXT
     );
@@ -22,13 +22,13 @@ ddl = """
     );
     DROP TABLE IF EXISTS product;
     CREATE TABLE product (
-        product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_id INTEGER PRIMARY KEY,
         product_name TEXT,
         standard_rate NUMERIC  -- 10, 15, or 20
     );
     DROP TABLE IF EXISTS subscription;
     CREATE TABLE subscription (
-        subscription_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        subscription_id INTEGER PRIMARY KEY,
         consumer_id INTEGER,
         status TEXT, -- Active/Inactive 
         subscription_rate NUMERIC,  -- 1 to 20, and <= product.standard_rate
@@ -47,6 +47,16 @@ ddl = """
     CREATE TABLE median_household_income 
     (
         city TEXT PRIMARY KEY,
+        median_household_income INTEGER
+    );
+    DROP TABLE IF EXISTS target_subscription;
+    CREATE TABLE target_subscription (
+        subscription_id INTEGER PRIMARY KEY,
+        status TEXT,
+        product_name TEXT, -- Active/Inactive 
+        risk_level NUMERIC,  -- 1 to 20, and <= product.standard_rate
+        subscription_rate INTEGER,
+        household_income INTEGER, -- 1 to 5
         median_household_income INTEGER
     );
 """

@@ -1,10 +1,16 @@
-def median_household_income(city: str) -> int:
+def send_to_marketing_campaign(campaign_id: str, subscription_ids:List[int]) -> None:
+    """
+    Simulate tool call from the generated Prolog program to send target subscriptions to a marketing campaign.
+    This typically involves calling some APIs of a consumer marketing platform.
+    """
+    print(f"{subscription_ids} sent to marketing campaign {campaign_id}.")
 
+
+def median_household_income(city: str) -> int:
     """
     This is to simulate tool call from the generated Prolog program.
     From here, it could be a call to a web search AI agent, or a call to a service provider API.
     """
-
     median_household_income = {
         "Austin": 91461,
         "Boston": 94755,

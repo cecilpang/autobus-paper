@@ -1,10 +1,10 @@
 import asyncio
 from agents import gen_trace_id, trace
-from util import WorkflowContext, AgentSession
+from util.agent_session import WorkflowContext, AgentSession
 from agent.core_agent import core_agent, AGENT_NAME
 
 """
-Task 2: Find the median household incomes of the cities in which our subscribers reside.
+Task 2: Find the median household incomes of the cities of the subscribers
 """
 
 async def main():
@@ -15,7 +15,7 @@ async def main():
         task_instruction = """
             Task ID: task_2
             Find the median household incomes of the cities in which our subscribers reside.
-            Obtain the median household income of cities by calling a Python function 'tool_for_prolog:median_household_income', 
+            Obtain the median household income of cities by calling the tool 'tool_simulation:median_household_income', 
             passing in the city, expecting an integer returned.
             Outcome specification:
             The outcome has two fields: city, median_household_income.

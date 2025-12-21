@@ -10,11 +10,11 @@ The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
     git clone https://github.com/cecilpang/autobus-paper.git
     cd autobus-paper
     ```
-3. Place your OpenAI API key in a file named '.env' at the project directory. There should be one line in .env:
+3. Place your OpenAI API key in the file `.env` at the project directory. There should be one line in `.env`:
     ```
-    OPENAI_API_KEY=your OpenAI key
+    OPENAI_API_KEY=<your OpenAI key>
     ```
-4. Create sample data. A sqlite database file 'db.sqlite' will be created in sub-directory database.
+4. Create sample data. A sqlite database file 'db.sqlite' will be created in the sub-directory `database`.
     ```
     uv run --script src/create_sample_data.py
     ```

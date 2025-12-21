@@ -1,9 +1,6 @@
 import janus_swi as janus
 import sys
 
-def age_of(name: str) -> int:
-    n = (name or '').strip()
-    return 18 + (sum(ord(c) for c in n) % 60)
 
 def main(argv):
     if len(argv) <= 1:
@@ -13,6 +10,8 @@ def main(argv):
     janus.query_once(f"consult('{argv[1]}')")
     # run the query
     janus.query_once("main")
+
+    print(f"{argv[1]} ran successfully.")
 
 
 if __name__ == "__main__":
