@@ -27,13 +27,13 @@ init_db :-
                    ]).
 
 % -----------------------------
-% Tool call via Python function
+% Call tools via Python function
 % -----------------------------
 
-%% median_household_income_city(+City, -Median)
-%% Calls Python tool_for_prolog:median_household_income(City) -> Median (integer)
-median_household_income_city(City, Median) :-
-    py_call(tool_for_prolog:median_household_income(City), Median).
+%% median_household_income_for_city(+City, -Income)
+%% Calls Python tool_for_prolog:median_household_income(City) -> Income (integer)
+median_household_income_for_city(City, Income) :-
+    py_call(tool_for_prolog:median_household_income(City), Income).
 
 % -----------------------------
 % Business rules
@@ -46,31 +46,28 @@ subscriber_city(City) :-
     consumer(ConsumerId, _ConsumerName, City).
 
 %% distinct_subscriber_city(-City)
-%% Unique cities derived from subscriber_city/1.
+%% Deduplicated city list.
 distinct_subscriber_city(City) :-
     setof(C, subscriber_city(C), Cities),
     member(City, Cities).
-
-%% outcome_row(-City, -Median)
-%% Produces outcome rows.
-outcome_row(City, Median) :-
-    distinct_subscriber_city(City),
-    median_household_income_city(City, Median).
 
 % -----------------------------
 % Actions
 % -----------------------------
 
+%% save_outcome_to_database/0
+%% Clears median_household_income then inserts (city, median_household_income)
+%% for each city where our subscribers reside.
 save_outcome_to_database :-
     outcome_table(OutcomeTable),
     format(atom(DeleteSql), "DELETE FROM ~w;", [OutcomeTable]),
     sqlite_query(db, DeleteSql, _),
-
-    forall( outcome_row(City, Median),
+    forall( distinct_subscriber_city(City),
             (
+                median_household_income_for_city(City, Income),
                 escape_sql_string(City, EscapedCity),
                 outcome_table(OutcomeTable),
-                format(atom(SQL), "INSERT INTO ~w(city, median_household_income) VALUES ('~w', ~w);", [OutcomeTable, EscapedCity, Median]),
+                format(atom(SQL), "INSERT INTO ~w(city, median_household_income) VALUES ('~w', ~w);", [OutcomeTable, EscapedCity, Income]),
                 sqlite_query(db, SQL, _)
             )
           ).
@@ -79,6 +76,8 @@ save_outcome_to_database :-
 % Helpers
 % -----------------------------
 
+%% escape_sql_string(+In:string, -Out:atom)
+%% Replace single quotes ' with '' for safe SQL single-quoted literal insertion.
 escape_sql_string(In, Out) :-
     split_string(In, "'", "'", Parts),
     atomic_list_concat(Parts, "''", Out).

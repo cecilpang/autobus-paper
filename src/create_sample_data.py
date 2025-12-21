@@ -1,6 +1,7 @@
 import sqlite3
 import random
-from config import DB_PATH
+from config import DB_PATH, DB_DIR
+import os
 
 random.seed(12345)
 
@@ -279,6 +280,7 @@ def get_subscriptions_filtered(
     return rows
 
 def main():
+    os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
 
     create_tables(conn)
