@@ -30,47 +30,53 @@ init_db :-
 % Call tools via Python function
 % -----------------------------
 
-%% median_household_income_for_city(+City, -Income)
-%% Calls Python tool_for_prolog:median_household_income(City) -> Income (integer)
-median_household_income_for_city(City, Income) :-
-    py_call(tool_for_prolog:median_household_income(City), Income).
+%% median_income_of_city(+City, -MedianIncome:int)
+%% Calls Python tool_for_prolog:median_household_income(City) -> MedianIncome
+median_income_of_city(City, MedianIncome) :-
+    py_call(tool_for_prolog:median_household_income(City), MedianIncome).
 
 % -----------------------------
 % Business rules
 % -----------------------------
 
 %% subscriber_city(-City)
-%% City where at least one subscriber (consumer with a subscription) resides.
+%% City for each subscriber (active subscriptions), potentially with duplicates.
 subscriber_city(City) :-
-    subscription(_SubscriptionId, ConsumerId, _Status, _SubscriptionRate, _ProductId, _RiskLevel),
+    subscription(_SubscriptionId, ConsumerId, Status, _SubscriptionRate, _ProductId, _RiskLevel),
+    Status = 'Active',
     consumer(ConsumerId, _ConsumerName, City).
 
 %% distinct_subscriber_city(-City)
-%% Deduplicated city list.
+%% Unique cities where subscribers reside.
 distinct_subscriber_city(City) :-
     setof(C, subscriber_city(C), Cities),
     member(City, Cities).
+
+%% outcome_row(-City, -MedianIncome)
+%% Compute median household income for each subscriber city.
+outcome_row(City, MedianIncome) :-
+    distinct_subscriber_city(City),
+    median_income_of_city(City, MedianIncome).
 
 % -----------------------------
 % Actions
 % -----------------------------
 
 %% save_outcome_to_database/0
-%% Clears median_household_income then inserts (city, median_household_income)
-%% for each city where our subscribers reside.
+%% Clears median_household_income then inserts (city, median_household_income).
 save_outcome_to_database :-
     outcome_table(OutcomeTable),
     format(atom(DeleteSql), "DELETE FROM ~w;", [OutcomeTable]),
     sqlite_query(db, DeleteSql, _),
-    forall( distinct_subscriber_city(City),
-            (
-                median_household_income_for_city(City, Income),
-                escape_sql_string(City, EscapedCity),
-                outcome_table(OutcomeTable),
-                format(atom(SQL), "INSERT INTO ~w(city, median_household_income) VALUES ('~w', ~w);", [OutcomeTable, EscapedCity, Income]),
-                sqlite_query(db, SQL, _)
-            )
-          ).
+    forall(
+        outcome_row(City, MedianIncome),
+        (
+            escape_sql_string(City, EscapedCity),
+            outcome_table(OutcomeTable),
+            format(atom(InsertSql), "INSERT INTO ~w (city, median_household_income) VALUES ('~w', ~w);", [OutcomeTable, EscapedCity, MedianIncome]),
+            sqlite_query(db, InsertSql, _)
+        )
+    ).
 
 % -----------------------------
 % Helpers
@@ -81,3 +87,7 @@ save_outcome_to_database :-
 escape_sql_string(In, Out) :-
     split_string(In, "'", "'", Parts),
     atomic_list_concat(Parts, "''", Out).
+
+% -----------------------------
+% End of file
+% -----------------------------

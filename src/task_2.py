@@ -14,12 +14,12 @@ async def main():
 
         task_instruction = """
             Task ID: task_2
-            Find the median household incomes of the cities in which our subscribers reside:
-            1. Get the list of cities from the database
-            2. Call a Python function 'tool_for_prolog:median_household_income', passing in each city, expecting an integer returned.
+            Find the median household incomes of the cities in which our subscribers reside.
+            Obtain the median household income of cities by calling a Python function 'tool_for_prolog:median_household_income', 
+            passing in the city, expecting an integer returned.
             Outcome specification:
-            The outcome has two fields: city, median_household_income
-            Save the outcome to the database table 'median_household_income'
+            The outcome has two fields: city, median_household_income.
+            Save the outcome to the database table 'median_household_income'.
         """
 
         print(f"View trace: https://platform.openai.com/traces/trace?trace_id={trace_id}\n")
