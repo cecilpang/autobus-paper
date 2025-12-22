@@ -12,5 +12,5 @@ web_search_agent = Agent(
     name="AGENT_NAME",
     model=LLM,
     instructions=INSTRUCTIONS,
-    tools=[WebSearchTool]
+    tools=[WebSearchTool()]
 )

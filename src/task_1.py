@@ -1,6 +1,6 @@
 import asyncio
 from agents import gen_trace_id, trace
-from src.agent.agent_session import WorkflowContext, AgentSession
+from agent.agent_session import WorkflowContext, AgentSession
 from agent.core_agent import core_agent, AGENT_NAME
 
 """
