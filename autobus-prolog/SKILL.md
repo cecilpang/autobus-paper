@@ -19,7 +19,7 @@ First, obtain the current database schema to ensure the generated Prolog logic m
 
 ### 2. Retrieve Template
 Load the foundational Prolog rules and database connection logic.
-- **Action**: Read `autobus-prolog/references/prolog_template.md`.
+- **Action**: Read `autobus-prolog/references/prolog_template.pl`.
 - **Reason**: This provides the standard `init_db`, `main`, and helper predicates required for Janus-SWI execution.
 
 ### 3. Generate Logic
@@ -40,7 +40,7 @@ Translate the user's business requirements into task-specific Prolog rules.
 ## Example Task
 If a user asks: *"Run Task 1: Identify savable churners with high risk and subscription rate >= 10"*:
 1. Run `get_db_schema.py`.
-2. Read `prolog_template.md`.
+2. Read `prolog_template.pl`.
 3. Generate logic that filters `subscription` joined with `profile_attribute` (for churn indicators).
 4. Save to `generated/task_1_logic.pl`.
 5. Execute via `run_prolog.py`.
