@@ -8,7 +8,7 @@ This idea is **highly feasible and architecturally elegant**.
 Currently, `core_agent.py` acts as a middleman to an LLM, gathering the database schema and a Prolog template to generate `.pl` files. 
 By creating a Gemini CLI Skill, we can transfer this exact procedural knowledge directly into Gemini CLI. 
 *   **Context Management:** We can bundle the Prolog template as a `reference` file and use a lightweight `script` to fetch the DB schema on demand.
-*   **Execution:** Gemini CLI natively supports executing terminal commands, meaning it can easily run `janus-swi` (via `src/run_prolog.py`) to execute the generated logic.
+*   **Execution:** Gemini CLI natively supports executing terminal commands, meaning it can easily run `janus-swi` (via `autobus-prolog/scripts/run_prolog.py`) to execute the generated logic.
 *   **Result:** A seamless workflow where you can type "Identify high risk churners" into Gemini CLI, and it will autonomously generate the Prolog logic and execute it against your SQLite DB.
 
 ## Skill Architecture (`autobus-prolog` skill)
@@ -90,5 +90,5 @@ This phase ensures that the Gemini CLI Skill `autobus-prolog` produces logic equ
 
 ### Success Criteria
 - [ ] **Structural Identity**: The logic in `_skill_test.pl` files is functionally identical to reference files.
-- [ ] **Execution Success**: Running `uv run src/run_prolog.py generated/task_N_logic_skill_test.pl` completes without errors.
+- [ ] **Execution Success**: Running `uv run autobus-prolog/scripts/run_prolog.py generated/task_N_logic_skill_test.pl` completes without errors.
 - [ ] **Data Integrity**: The final tables in `db.sqlite` reflect the intended business outcome.

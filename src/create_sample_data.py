@@ -1,7 +1,9 @@
 import sqlite3
 import random
-from config import DB_PATH, DB_DIR
 import os
+
+DB_DIR = 'database'
+DB_PATH = 'database/db.sqlite'
 
 random.seed(12345)
 

@@ -1,21 +1,17 @@
 :- use_module(library(prosqlite)).
 
-% Optional: still allow running as a script
 :- initialization(main).
 
 % -----------------------------
 % Public entry point
 % -----------------------------
-
-%% main/0
-%% Entry point to run the program
 main :-
     init_db,
     save_outcome_to_database,
     sqlite_disconnect(db).
 
 % -----------------------------
-% Database initialization
+% Database initialization 
 % -----------------------------
 
 db_path('database/db.sqlite').
@@ -30,59 +26,33 @@ init_db :-
                    ]).
 
 % -----------------------------
-% Table-as-predicate
-% -----------------------------
-
-% With as_predicates(true) each table is exposed as a predicate, e.g.:
-%   subscription(SubscriptionId, ConsumerId, Status, SubscriptionRate, ProductId, RiskLevel)
-%   product(ProductId, ProductName, StandardRate)
-%   savable_churn(SubscriptionId, ConsumerId)
-
-% -----------------------------
 % Business rules
 % -----------------------------
 
 %% savable_churn_candidate(-SubscriptionId, -ConsumerId)
-%% A subscription is a savable churn if:
-%% 1) risk_level is 4
-%% 2) subscription_rate >= 10
-%% 3) product is 'Premium Plan' or 'Family Plan'
-%% 4) status is 'Active'
-
 savable_churn_candidate(SubscriptionId, ConsumerId) :-
-    subscription(SubscriptionId, ConsumerId, Status, SubscriptionRate, ProductId, RiskLevel),
-    RiskLevel =:= 4,
+    % 1. The subscription's churn risk level is 4
+    % 2. The subscription rate is $10 or more
+    % 4. The subscription is active
+    subscription(SubscriptionId, ConsumerId, 'Active', SubscriptionRate, ProductId, 4),
     SubscriptionRate >= 10,
-    Status = 'Active',
-    product(ProductId, ProductName, _StandardRate),
-    ( ProductName = 'Premium Plan'
-    ; ProductName = 'Family Plan'
-    ).
+    
+    % 3. The subscription is for 'Premium Plan' or 'Family Plan'
+    product(ProductId, ProductName, _),
+    ( ProductName = 'Premium Plan' ; ProductName = 'Family Plan' ).
 
 % -----------------------------
 % Actions
 % -----------------------------
 
-%% save_outcome_to_database/0
-%% Clears savable_churn then inserts (subscription_id, consumer_id) for all candidates.
 save_outcome_to_database :-
     outcome_table(OutcomeTable),
     format(atom(DeleteSql), "DELETE FROM ~w;", [OutcomeTable]),
     sqlite_query(db, DeleteSql, _),
+    
     forall( savable_churn_candidate(SubscriptionId, ConsumerId),
             (
-                outcome_table(OutcomeTable),
-                format(atom(InsertSql), "INSERT INTO ~w(subscription_id, consumer_id) VALUES (~w, ~w);", [OutcomeTable, SubscriptionId, ConsumerId]),
-                sqlite_query(db, InsertSql, _)
+                format(atom(SQL), "INSERT INTO ~w (subscription_id, consumer_id) VALUES (~w, ~w);", [OutcomeTable, SubscriptionId, ConsumerId]),
+                sqlite_query(db, SQL, _)
             )
           ).
-
-% -----------------------------
-% Helpers
-% -----------------------------
-
-% (none)
-
-% -----------------------------
-% End of file
-% -----------------------------

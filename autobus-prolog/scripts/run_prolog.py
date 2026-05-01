@@ -4,7 +4,7 @@ import sys
 
 def main(argv):
     if len(argv) <= 1:
-        print("Usage: run_prolog.py <prolog_file.pl>")
+        print("Usage: autobus-prolog/scripts/run_prolog.py <prolog_file.pl>")
 
     # load the prolog program
     janus.query_once(f"consult('{argv[1]}')")

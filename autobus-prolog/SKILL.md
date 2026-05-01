@@ -34,7 +34,7 @@ Translate the user's business requirements into task-specific Prolog rules.
 - **Save**: Write the complete Prolog program to `generated/<Task ID>_logic.pl`.
 - **Execute**: Run the program using the project's execution bridge:
   ```bash
-  uv run --script src/run_prolog.py generated/<Task ID>_logic.pl
+  uv run --script autobus-prolog/scripts/run_prolog.py generated/<Task ID>_logic.pl
   ```
 
 ## Example Task
