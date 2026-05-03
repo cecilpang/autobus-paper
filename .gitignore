@@ -26,4 +26,6 @@ uv.lock
 
 # Project specific
 .gemini/
+generate-prolog.skill
+qa.skill
 a.out
