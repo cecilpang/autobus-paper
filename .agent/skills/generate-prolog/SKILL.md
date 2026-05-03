@@ -16,7 +16,7 @@ This skill enables Gemini CLI to act as the core reasoning engine for the Autobu
 ### 2. Logic Generation (The Generator)
 - **Agent**: Spawn a sub-agent to translate the natural language task into Prolog.
 - **Action**: 
-    - Run `python .agent/skills/generate-prolog/scripts/get_db_schema.py` to get the database schema.
+    - Run `python .agent/skills/tools/get_db_schema.py` to get the database schema.
     - Read `.agent/skills/generate-prolog/references/prolog_template.pl` to load foundational Prolog rules and database connection logic.
     - Read `tasks/<task_id>.md` for the specific requirements.
 - **Goal**: Create a Janus-SWI compliant Prolog file.
