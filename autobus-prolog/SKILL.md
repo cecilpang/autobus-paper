@@ -6,41 +6,52 @@ description: Use when generating and executing SWI-Prolog logic for the autobus-
 # Autobus Prolog
 
 ## Overview
-This skill enables Gemini CLI to act as the core reasoning engine for the Autobus project. It provides a structured workflow to translate natural language business requirements into precise SWI-Prolog code, which is then executed against the project's SQLite database to perform deterministic data operations.
+This skill enables Gemini CLI to act as the core reasoning engine for the Autobus project. It uses a multi-agent validation loop to ensure that generated Prolog code is correct, syntactically valid, and adheres to business requirements before execution.
 
 ## Workflow
 
-To execute a business task using this skill, follow these steps:
+### 1. Initialization & Context Gathering
+- **Action**: Establish a versioned directory for the current run: `generated/runs/<task_id>/v<N>/`.
 
-### 1. Gather Context
-First, obtain the current database schema to ensure the generated Prolog logic matches the table structures and constraints.
-- **Action**: Run `python autobus-prolog/scripts/get_db_schema.py`.
-- **Reason**: The LLM needs to know exactly which tables and columns are available (e.g., `consumer`, `subscription`, `profile_attribute`).
+### 2. Logic Generation (The Generator)
+- **Agent**: Spawn a sub-agent to translate the natural language task into Prolog.
+- **Action**: 
+    - Run `python autobus-prolog/scripts/get_db_schema.py` to get the database schema.
+    - Read `autobus-prolog/references/prolog_template.pl` to load foundational Prolog rules and database connection logic.
+    - Read `tasks/<task_id>.md` for the specific requirements.
+- **Goal**: Create a Janus-SWI compliant Prolog file.
+- **Output**: Save to `generated/runs/<task_id>/v<N>/candidate.pl`.
 
-### 2. Retrieve Template
-Load the foundational Prolog rules and database connection logic.
-- **Action**: Read `autobus-prolog/references/prolog_template.pl`.
-- **Reason**: This provides the standard `init_db`, `main`, and helper predicates required for Janus-SWI execution.
+### 3. Syntax Check
+- **Action**: Run the syntax check: `python autobus-prolog/scripts/validate_syntax.py generated/runs/<task_id>/v<N>/candidate.pl`.
+- **Goal**: Ensure the Prolog code is syntactically correct and adheres to Janus-SWI conventions.
+- **If Failed**: Provide feedback to the Generator and restart Step 2 with an incremented version `v<N+1>`.
 
-### 3. Generate Logic
-Translate the user's business requirements into task-specific Prolog rules.
-- **Guidelines**:
-    - Identify the **Task ID** from the request (e.g., `task_1`, `task_2`).
-    - Define the core business logic as Prolog predicates.
-    - Implement the `save_outcome_to_database` predicate to perform the final data transformation or tool calls.
-    - Use the `py_call` mechanism if external tools (like web search or marketing APIs) are required.
+### 4. Multi-Agent Validation Loop (The Evaluators)
+- **Agent**: Spawn three independent sub-agents (using different backend models where possible). 
+    - **Evaluator A (Business Logic)**: Verifies if the logic strictly follows all criteria in the Task instruction.
+    - **Evaluator B (Syntax & Schema)**: Verifies if table/column names match the schema and if Janus-SWI predicates are used correctly.
+    - **Evaluator C (Edge Cases & Safety)**: Checks for SQL safety, handling of nulls/missing data, and logical edge cases.
+- **Action**: Each evaluator reads the `candidate.pl` and the original task instructions.
+- **Goal**: Evaluate the `candidate.pl` against the original task instructions on the three dimensions (business logic, syntax/schema, edge cases)
+- **Output**: Each evaluator writes their findings to `generated/runs/<task_id>/v<N>/eval_<A|B|C>_report.md`.
 
-### 4. Save and Execute
-- **Save**: Write the complete Prolog program to `generated/<Task ID>_logic.pl`.
-- **Execute**: Run the program using the project's execution bridge:
+### 5. Consensus Review (The Reviewer)
+- **Agent**: Spawn a sub-agent to review the three evaluation reports.
+- **Action**: Read three evaluation reports, synthesize findings, identify contradictions (split decisions), and produce a final recommendation.
+- **Output**: Save to `generated/runs/<task_id>/v<N>/review_summary.md`.
+
+### 6. Human Approval & Feedback
+- **Action**: Present the `review_summary.md` and `candidate.pl` to the user.
+- **Decision**:
+    - **Approved**: Copy `candidate.pl` to `generated/<task_id>_logic.pl` and execute.
+    - **Feedback**: If the user provides feedback or updates instructions, the Lead Agent merges the new info with the initial task and restarts from Step 2 (incrementing the version `v<N+1>`).
+
+### 7. Execution
+- **Action**: Run the program:
   ```bash
-  uv run --script autobus-prolog/scripts/run_prolog.py generated/<Task ID>_logic.pl
+  uv run --script autobus-prolog/scripts/run_prolog.py generated/<task_id>_logic.pl
   ```
 
-## Example Task
-If a user asks: *"Run Task 1: Identify savable churners with high risk and subscription rate >= 10"*:
-1. Run `get_db_schema.py`.
-2. Read `prolog_template.pl`.
-3. Generate logic that filters `subscription` joined with `profile_attribute` (for churn indicators).
-4. Save to `generated/task_1_logic.pl`.
-5. Execute via `run_prolog.py`.
+## State Management
+Always maintain the `generated/runs/` history. Do not delete old versions. Use these files to explain the reasoning process if the user asks.
