@@ -41,11 +41,8 @@ init_db :-
 savable_churn_row(SubID, ConsumerID) :-
     % subscription(subscription_id, consumer_id, status, subscription_rate, product_id, risk_level)
     subscription(SubID, ConsumerID, Status, Rate, ProductID, 4),
-    % Safety guard: check if Status is an atom (not NULL/variable)
-    atom(Status),
+    % Case-insensitive check for 'active'
     downcase_atom(Status, active),
-    % Safety guard: check if Rate is a number (not NULL/variable)
-    number(Rate),
     Rate >= 10.0,
     % product(product_id, product_name, standard_rate)
     product(ProductID, ProductName, _),
@@ -67,8 +64,7 @@ save_outcome_to_database :-
     forall( savable_churn_row(SubID, ConsumerID),
             (
                 outcome_table(OutcomeTable),
-                % SQL Safety: Quote values in case they are treated as strings or identifiers
-                format(atom(SQL), "INSERT INTO ~w (subscription_id, consumer_id) VALUES ('~w', '~w');", [OutcomeTable, SubID, ConsumerID]),
+                format(atom(SQL), "INSERT INTO ~w (subscription_id, consumer_id) VALUES (~w, ~w);", [OutcomeTable, SubID, ConsumerID]),
                 sqlite_query(db, SQL, _)
             )
           ).
