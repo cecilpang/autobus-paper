@@ -5,7 +5,8 @@ import sqlite3
 from config import PROLOG_TEMPLATE_DIR, GENERATED_PROLOG_DIR, DB_PATH
 
 
-LLM = "gpt-5.2"
+#LLM = "gpt-5.2"
+LLM = "litellm/gemini/gemini-3-flash-preview"
 AGENT_NAME = "core_agent"
 
 
