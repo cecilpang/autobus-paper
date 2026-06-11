@@ -1,7 +1,7 @@
 [project]
 name = "autobus"
 version = "0.1.0"
-description = "Paper: Autonomous Business System via Neuro-symbolic AI"
+description = "Paper: Validation of Neuro-symbolic Autonomous Business System"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [

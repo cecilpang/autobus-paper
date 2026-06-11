@@ -1,9 +1,9 @@
-## Paper: Autonomous Business System via Neuro-symbolic AI
+## Paper: Validation of Neuro-symbolic Autonomous Business System
 #### Please refer to the Validation Case Study section of the paper.
 The AI agents use OpenAI's LLMs: https://platform.openai.com/docs/models<br/>
 The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
 
-### To run the demo:
+### To run the case study:
 1. Install uv: https://github.com/astral-sh/uv
 2. Clone this repo and cd into the project directory.
     ```
