@@ -5,10 +5,11 @@ The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
 
 ### To run the case study:
 1. Install uv: https://github.com/astral-sh/uv
-2. Clone this repo and cd into the project directory.
+2. Clone this repo and checkout the "agentic-coding" branch:
     ```
     git clone https://github.com/cecilpang/autobus-paper.git
     cd autobus-paper
+    git checkout agentic-coding
     ```
 3. Place your OpenAI API key in the file `.env` at the project directory. There should be one line in `.env`:
     ```
