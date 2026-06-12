@@ -16,14 +16,14 @@ This skill enables Gemini CLI to act as the core reasoning engine for the Autobu
 ### 2. Logic Generation (The Generator)
 - **Agent**: Spawn a sub-agent to translate the natural language task into Prolog.
 - **Action**: 
-    - Run `python .agent/skills/tools/get_db_schema.py` to get the database schema.
-    - Read `.agent/skills/generate-prolog/references/prolog_template.pl` to load foundational Prolog rules and database connection logic.
+    - Run `python .agents/skills/tools/get_db_schema.py` to get the database schema.
+    - Read `.agents/skills/generate-prolog/references/prolog_template.pl` to load foundational Prolog rules and database connection logic.
     - Read `tasks/<task_id>.md` for the specific requirements.
 - **Goal**: Create a Janus-SWI compliant Prolog file.
 - **Output**: Save to `generated/runs/<task_id>/v<N>/candidate.pl`.
 
 ### 3. Syntax Check
-- **Action**: Run the syntax check: `python .agent/skills/generate-prolog/scripts/validate_syntax.py generated/runs/<task_id>/v<N>/candidate.pl`.
+- **Action**: Run the syntax check: `python .agents/skills/generate-prolog/scripts/validate_syntax.py generated/runs/<task_id>/v<N>/candidate.pl`.
 - **Goal**: Ensure the Prolog code is syntactically correct and adheres to Janus-SWI conventions.
 - **If Failed**: Provide feedback to the Generator and restart Step 2 with an incremented version `v<N+1>`.
 
@@ -50,7 +50,7 @@ This skill enables Gemini CLI to act as the core reasoning engine for the Autobu
 ### 7. Execution
 - **Action**: Run the program:
   ```bash
-  uv run --script .agent/skills/generate-prolog/scripts/run_prolog.py generated/<task_id>_logic.pl
+  uv run --script .agents/skills/generate-prolog/scripts/run_prolog.py generated/<task_id>_logic.pl
   ```
 
 ## State Management
