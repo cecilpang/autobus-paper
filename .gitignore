@@ -29,3 +29,4 @@ uv.lock
 generate-prolog.skill
 qa.skill
 a.out
+generated/

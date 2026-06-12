@@ -24,17 +24,14 @@ The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
 
     Task 1:
     ```
-    gemini "Run task 1 using the instructions in tasks/Task_1.md"
+    gemini "Run skill generate-prolog using the instructions in tasks/Task_1.md"
     ```
     Task 2:
     ```
-    gemini "Run task 2 using the instructions in tasks/Task_2.md"
+    gemini "Run skill generate-prolog using the instructions in tasks/Task_2.md"
     ```
     Task 3:
     ```
-    gemini "Run task 3 using the instructions in tasks/Task_3.md"
+    gemini "Run skill generate-prolog using the instructions in tasks/Task_3.md"
     ```
-7. Execute QA workflow for task 1:
-    ```
-    gemini "Run qa skill using the instructions in expected-outputs/Task_1_expected_outputs.md"
-    ```
+
