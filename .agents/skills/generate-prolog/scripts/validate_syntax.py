@@ -1,4 +1,3 @@
-import subprocess
 import sys
 import os
 
@@ -8,25 +7,37 @@ def validate_prolog(file_path):
         return False
     
     try:
-        # swipl -c file.pl runs the compiler check
-        result = subprocess.run(
-            ['swipl', '-c', file_path],
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode == 0:
+        # Prefer using janus_swi directly as it runs in the exact Python context
+        import janus_swi as janus
+        try:
+            janus.query_once(f"consult('{file_path}')")
             print(f"Syntax Check Passed: {file_path}")
             return True
-        else:
+        except Exception as e:
             print(f"Syntax Check Failed: {file_path}")
             print("Errors:")
-            print(result.stderr)
+            print(e)
             return False
-            
-    except FileNotFoundError:
-        print("Error: swipl (SWI-Prolog) not found in PATH.")
-        return False
+    except ImportError:
+        # Fallback to swipl -c compiler check if janus-swi is not available
+        import subprocess
+        try:
+            result = subprocess.run(
+                ['swipl', '-c', file_path],
+                capture_output=True,
+                text=True
+            )
+            if result.returncode == 0:
+                print(f"Syntax Check Passed: {file_path}")
+                return True
+            else:
+                print(f"Syntax Check Failed: {file_path}")
+                print("Errors:")
+                print(result.stderr)
+                return False
+        except FileNotFoundError:
+            print("Error: swipl (SWI-Prolog) not found in PATH.")
+            return False
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
