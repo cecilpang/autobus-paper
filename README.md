@@ -17,6 +17,7 @@ The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
     ```
 5. Create sample data. A sqlite database file 'db.sqlite' will be created in the sub-directory `database`.
     ```
+    uv sync
     uv run --script src/create_sample_data.py
     ```
 6. Execute the 3 tasks. Task 1 and 2 can run in parallel. Task 3 depends on the outcomes of Tasks 1 and 2.
