@@ -1,6 +1,5 @@
 ## Paper: Validation of Neuro-symbolic Autonomous Business System
-#### Please refer to the Validation Case Study section of the paper.
-The AI agents use OpenAI's LLMs: https://platform.openai.com/docs/models<br/>
+#### Please refer to the Case Study section of the paper.
 The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
 
 ### To run the case study:
@@ -16,12 +15,11 @@ The logic engine under the hood is SWI-Prolog: https://www.swi-prolog.org/
     ```
     GEMINI_API_KEY=<your Gemini key>
     ```
-4. Create sample data. A sqlite database file 'db.sqlite' will be created in the sub-directory `database`.
+5. Create sample data. A sqlite database file 'db.sqlite' will be created in the sub-directory `database`.
     ```
     uv run --script src/create_sample_data.py
     ```
-5. Execute the 3 tasks. Task 1 and 2 can run in parallel. Task 3 depends on the outcomes of Tasks 1 and 2.
-Use the Gemini CLI with the `autobus-prolog` skill to execute each task by pointing it to the respective task instruction file in `tasks/`.
+6. Execute the 3 tasks. Task 1 and 2 can run in parallel. Task 3 depends on the outcomes of Tasks 1 and 2.
 
     Task 1:
     ```
@@ -34,4 +32,8 @@ Use the Gemini CLI with the `autobus-prolog` skill to execute each task by point
     Task 3:
     ```
     gemini "Run task 3 using the instructions in tasks/Task_3.md"
+    ```
+7. Execute QA workflow for task 1:
+    ```
+    gemini "Run qa skill using the instructions in expected-outputs/Task_1_expected_outputs.md"
     ```
